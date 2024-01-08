@@ -1,0 +1,7 @@
+---
+endpoints:
+  - name: Get log files
+    method: GET
+    path: "/logs"
+    handler: "./get_logs.sh"
+    args: [$query.limit]
