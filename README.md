@@ -26,3 +26,20 @@ $ tacit -f {config_file} -p {server_port}
 - Default `config_file` is `./config.yml`
 - Default `server_port` is `8080`
 
+### Example
+
+```
+$ cd example/
+$ tacit 
+Registering endpoint:  {Get log files GET /logs ./get_logs.sh [$query.limit]}
+Ready. Tacit server is listening on port 8080
+```
+
+```
+$ curl "http://localhost:8080/logs?limit=3"
+{ "logfiles": [
+  "1.txt",
+  "2.txt",
+  "3.txt"
+] }
+```
