@@ -33,9 +33,9 @@ func main() {
 	}
 
 	// start server
-	s := server.New()
+	s := server.New(port)
 	s.RegisterEndpoints(config.Endpoints)
-	err = s.Listen(port)
+	err = s.Listen()
 	if err != nil {
 		panic(err)
 	}

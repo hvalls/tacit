@@ -10,10 +10,11 @@ import (
 )
 
 type Server struct {
+	port string
 }
 
-func New() *Server {
-	return &Server{}
+func New(port string) *Server {
+	return &Server{port}
 }
 
 func (s *Server) RegisterEndpoints(ee []config.Endpoint) error {
@@ -74,9 +75,9 @@ func buildArgs(r *http.Request, configArgs []string) ([]string, error) {
 	return args, nil
 }
 
-func (s *Server) Listen(port string) error {
-	fmt.Println("Ready. Tacit server is listening on port", port)
-	return http.ListenAndServe(fmt.Sprintf(":%s", port), nil)
+func (s *Server) Listen() error {
+	fmt.Println("Ready. Tacit server is listening on port", s.port)
+	return http.ListenAndServe(fmt.Sprintf(":%s", s.port), nil)
 }
 
 type ErrorResponse struct {
