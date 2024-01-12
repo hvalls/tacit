@@ -35,6 +35,7 @@ func (s *Server) registerEndpoint(e config.Endpoint) error {
 		s.r.GET(e.Path, func(c *gin.Context) {
 			handleGet(e, c)
 		})
+	case http.MethodPost:
 		s.r.POST(e.Path, func(c *gin.Context) {
 			handlePost(e, c)
 		})

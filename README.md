@@ -37,9 +37,11 @@ Ready. Tacit server is listening on port 8080
 
 ```
 $ curl "http://localhost:8080/logs?limit=3"
-{ "logfiles": [
-  "1.txt",
-  "2.txt",
-  "3.txt"
-] }
+{ "data": 
+  { "logfiles": [
+    "1.txt",
+    "2.txt",
+    "3.txt"
+  ] }
+}
 ```
