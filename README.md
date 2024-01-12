@@ -20,11 +20,11 @@ You can add as many endpoints as you need.
 ### Run server
 
 ```
-$ tacit -f {config_file} -p {server_port}
+$ PORT=9090 tacit -f {config_file}
 ```
 
 - Default `config_file` is `./config.yml`
-- Default `server_port` is `8080`
+- Default port is 8080
 
 ### Example
 

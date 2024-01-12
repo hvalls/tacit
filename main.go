@@ -17,7 +17,6 @@ func main() {
 	var configFilePath string
 	var port string
 	flag.StringVar(&configFilePath, "f", "", "Config file path")
-	flag.StringVar(&port, "p", "", "HTTP server port")
 	flag.Parse()
 	if configFilePath == "" {
 		configFilePath = DEFAULT_CONFIG_FILE_PATH
@@ -33,7 +32,7 @@ func main() {
 	}
 
 	// start server
-	s := server.New(port)
+	s := server.New()
 	s.RegisterEndpoints(config.Endpoints)
 	err = s.Listen()
 	if err != nil {

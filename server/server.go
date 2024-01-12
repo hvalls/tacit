@@ -2,19 +2,21 @@ package server
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strings"
 	"tacit/config"
 	"tacit/handler"
+
+	"github.com/gin-gonic/gin"
 )
 
 type Server struct {
-	port string
+	r *gin.Engine
 }
 
-func New(port string) *Server {
-	return &Server{port}
+func New() *Server {
+	r := gin.Default()
+	return &Server{r}
 }
 
 func (s *Server) RegisterEndpoints(ee []config.Endpoint) error {
@@ -28,36 +30,39 @@ func (s *Server) RegisterEndpoints(ee []config.Endpoint) error {
 }
 
 func (s *Server) registerEndpoint(e config.Endpoint) error {
-	fmt.Println("Registering endpoint: ", e)
-
-	http.HandleFunc(e.Path, func(w http.ResponseWriter, r *http.Request) {
-		//TODO: check http method
-		args, err := buildArgs(r, e.Args)
-		if err != nil {
-			panic(err) //TODO: change this
-		}
-		stdout, stderr, err := handler.Handle(handler.DEFAULT_SHELL, e.Handler, args)
-		if err != nil {
-			panic(err) //TODO: change this
-		}
-
-		w.Header().Add("Content-Type", "application/json")
-
-		if stderr != "" {
-			e := &ErrorResponse{stderr}
-			jsonData, err := json.Marshal(e)
-			if err != nil {
-				panic(err) //TODO: change this
-			}
-			w.WriteHeader(500)
-			fmt.Fprint(w, string(jsonData))
-			return
-		}
-
-		fmt.Fprint(w, stdout)
-	})
-
+	switch e.Method {
+	case http.MethodGet:
+		s.r.GET(e.Path, func(c *gin.Context) {
+			handleGet(e, c)
+		})
+		s.r.POST(e.Path, func(c *gin.Context) {
+			handlePost(e, c)
+		})
+	}
 	return nil
+}
+
+func handleGet(e config.Endpoint, c *gin.Context) {
+	args, err := buildArgs(c.Request, e.Args)
+	if err != nil {
+		panic(err) //TODO: change this
+	}
+	stdout, stderr, err := handler.Handle(handler.DEFAULT_SHELL, e.Handler, args)
+	if err != nil {
+		panic(err) //TODO: change this
+	}
+
+	if stderr != "" {
+		c.JSON(http.StatusInternalServerError, &ErrorResponse{stderr})
+		return
+	}
+
+	c.JSON(http.StatusOK, newResponse(stdout))
+}
+
+func handlePost(e config.Endpoint, c *gin.Context) {
+	//TODO: Implement
+	c.JSON(http.StatusOK, &ErrorResponse{"not supported yet"})
 }
 
 func buildArgs(r *http.Request, configArgs []string) ([]string, error) {
@@ -76,8 +81,20 @@ func buildArgs(r *http.Request, configArgs []string) ([]string, error) {
 }
 
 func (s *Server) Listen() error {
-	fmt.Println("Ready. Tacit server is listening on port", s.port)
-	return http.ListenAndServe(fmt.Sprintf(":%s", s.port), nil)
+	return s.r.Run()
+}
+
+type Response struct {
+	Data map[string]any `json:"data"`
+}
+
+func newResponse(rawData string) *Response {
+	var data map[string]any
+	err := json.Unmarshal([]byte(rawData), &data)
+	if err != nil {
+		panic(err) //TODO: Change this
+	}
+	return &Response{data}
 }
 
 type ErrorResponse struct {
