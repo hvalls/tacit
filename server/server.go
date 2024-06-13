@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strings"
 	"tacit/config"
@@ -48,6 +49,7 @@ func handleGet(e config.Endpoint, c *gin.Context) {
 	if err != nil {
 		panic(err) //TODO: change this
 	}
+	fmt.Printf("Attempting to handle | Shell: %s | Scritp Path: %s | Args: %v\n", handler.DEFAULT_SHELL, e.Handler, args)
 	stdout, stderr, err := handler.Handle(handler.DEFAULT_SHELL, e.Handler, args)
 	if err != nil {
 		panic(err) //TODO: change this

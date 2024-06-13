@@ -2,6 +2,7 @@ package handler
 
 import (
 	"bytes"
+	"fmt"
 	"os/exec"
 )
 
@@ -16,9 +17,11 @@ func Handle(shell string, scriptPath string, args []string) (string, string, err
 	cmd.Stdout = &stdoutBuffer
 	cmd.Stderr = &stderrBuffer
 	if err := cmd.Start(); err != nil {
+		fmt.Println("Error 1", err)
 		return "", "", err
 	}
 	if err := cmd.Wait(); err != nil {
+		fmt.Println("Error 2", err)
 		return "", "", err
 	}
 	return stdoutBuffer.String(), stderrBuffer.String(), nil
